@@ -32,7 +32,7 @@ Viewer leaves       → sidecar computes duration × rate
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/streamgate
+git clone https://github.com/0xUstaz/streamgate
 cd streamgate/sidecar
 pip3 install -r requirements.txt
 ```
