@@ -1,0 +1,30 @@
+# Secrets — NEVER commit these
+.env
+*.key
+
+# Database (local only)
+*.db
+*.db-shm
+*.db-wal
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+dist/
+*.egg-info/
+
+# Node
+node_modules/
+.npm/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
