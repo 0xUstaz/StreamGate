@@ -35,14 +35,14 @@ ARC_RPC_URL            = os.getenv(
 # USDC is also the native gas token on Arc (dual interface: native + ERC-20)
 GATEWAY_WALLET_CONTRACT = os.getenv(
     "GATEWAY_WALLET_CONTRACT",
-    "0x3600000000000000000000000000000000000000"  # confirmed USDC on Arc testnet
+    "0x0077777d7EBA4688BDeF3E311b846F25870A19B9"  # confirmed USDC on Arc testnet
 )
 
 # ── Owncast webhook security ──────────────────────────────────────────────────
 OWNCAST_WEBHOOK_SECRET = os.getenv("OWNCAST_WEBHOOK_SECRET", "")  # optional but recommended
 
 # ── App settings ──────────────────────────────────────────────────────────────
-PORT      = int(os.getenv("PORT", "8000"))
+PORT      = int(os.getenv("PORT", "8001"))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 DB_PATH   = os.getenv("DB_PATH", "streamgate.db")
 

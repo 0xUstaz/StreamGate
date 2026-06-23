@@ -1,0 +1,14 @@
+{
+  "name": "streamgate-payment-bridge",
+  "version": "1.0.0",
+  "description": "Circle x402 nanopayment bridge for StreamGate",
+  "main": "settle.js",
+  "scripts": {
+    "test": "node settle.js --help"
+  },
+  "dependencies": {
+    "@circle-fin/x402-batching": "latest",
+    "viem": "^2.0.0"
+  }
+}
+
