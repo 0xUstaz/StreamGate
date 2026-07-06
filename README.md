@@ -214,6 +214,5 @@ Built by **Ustaz** ([@0xUstaz](https://github.com/0xUstaz)) — CS student, buil
 
 - X: [@0xUstaz](https://x.com/0xUstaz)
 - GitHub: [@0xUstaz](https://github.com/0xUstaz)
-- Previous: 🏆 Standout Winner — Agora Agent Hackathon
 
 ⭐ Star the repo if you find it useful
