@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamGate — Live</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.12/hls.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f5f5f7;
+    color: #1d1d1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Video ── */
+  #video-wrap {
+    position: relative;
+    width: 100%;
+    background: #1c1c1e;
+    aspect-ratio: 16/9;
+    flex-shrink: 0;
+  }
+
+  #stream-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  #offline-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    background: #080810;
+  }
+  #offline-overlay h3 { color: #86868b; font-size: 16px; }
+  #offline-overlay p  { color: #c7c7cc; font-size: 13px; }
+
+  /* Live badge */
+  #live-badge {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff3b30;
+    color: #fff;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* ── Bottom panel ── */
+  #bottom-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  /* ── Meter card ── */
+  .meter-card {
+    background: #fff;
+    border: 1px solid #e5e5ea;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .meter-left .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #86868b;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .meter-left .amount {
+    font-size: 28px;
+    color: #34c759;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+
+  .meter-left .sub {
+    font-size: 11px;
+    color: #86868b;
+    margin-top: 3px;
+  }
+
+  .meter-right {
+    text-align: right;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ffaa40;
+    margin-right: 5px;
+  }
+  .status-dot.live   { background: #40ff40; animation: pulse 1.2s ease-in-out infinite; }
+  .status-dot.error  { background: #ff4040; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.7)} }
+
+  .status-text { font-size: 11px; color: #3a3a3c; font-weight: 500; }
+  .rate-text   { font-size: 11px; color: #86868b; margin-top: 4px; }
+  .wallet-text { font-size: 10px; color: #c7c7cc; margin-top: 2px; font-family: monospace; }
+
+  /* ── Activate panel ── */
+  #activate-card {
+    background: #fff;
+    border: 1px solid #e5e5ea;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  #activate-card .card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #3a3a3c;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  #activate-card .input-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  #username-input {
+    flex: 1;
+    padding: 9px 12px;
+    background: #f5f5f7;
+    border: 1.5px solid #e5e5ea;
+    border-radius: 9px;
+    color: #1d1d1f;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+  }
+  #username-input:focus { border-color: #5856d6; background: #fff; }
+
+  #start-btn {
+    padding: 9px 18px;
+    background: linear-gradient(135deg, #5856d6, #af52de);
+    border: none;
+    border-radius: 7px;
+    color: #fff;
+    font-family: monospace;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  #start-btn:hover { opacity: 0.9; }
+
+  #activate-success {
+    display: none;
+    font-size: 13px;
+    color: #34c759;
+    padding: 4px 0;
+  }
+
+  /* ── Receipt ── */
+  #receipt-card {
+    display: none;
+    background: #fff;
+    border: 1px solid #e5e5ea;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .receipt-title { font-size: 12px; font-weight: 700; color: #1d1d1f; margin-bottom: 10px; }
+
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #f2f2f7;
+    font-size: 13px;
+  }
+  .receipt-row:last-of-type { border: none; }
+  .rk { color: #86868b; }
+  .rv { color: #1d1d1f; font-weight: 600; text-align: right; word-break: break-all; max-width: 55%; }
+
+  .tx-link {
+    display: block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #5856d6;
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .tx-link:hover { color: #af52de; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #c7c7cc;
+    padding: 8px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Stream video -->
+<div id="video-wrap">
+  <video id="stream-video" controls autoplay muted playsinline></video>
+  <div id="offline-overlay">
+    <h3>Stream Offline</h3>
+    <p>Check back when the streamer is live.</p>
+  </div>
+  <div id="live-badge">● LIVE</div>
+</div>
+
+<!-- Bottom controls -->
+<div id="bottom-panel">
+
+  <!-- Payment meter -->
+  <div class="meter-card">
+    <div class="meter-left">
+      <div class="label">Spent this session</div>
+      <div class="amount" id="sg-amount">$0.000000</div>
+      <div class="sub" id="sg-timer">0 seconds watched</div>
+    </div>
+    <div class="meter-right">
+      <div>
+        <span class="status-dot" id="sg-dot"></span>
+        <span class="status-text" id="sg-status">Not started</span>
+      </div>
+      <div class="rate-text"  id="sg-rate"></div>
+      <div class="wallet-text" id="sg-wallet"></div>
+    </div>
+  </div>
+
+  <!-- Activate panel -->
+  <div id="activate-card">
+    <div class="card-label">Step 3 — Activate Payment</div>
+    <div class="input-row">
+      <input id="username-input" type="text" placeholder="Enter your name" />
+      <button id="start-btn" onclick="activatePayment()">▶ Start</button>
+    </div>
+    <div id="activate-success">✓ Payment active — meter is running</div>
+  </div>
+
+  <!-- Receipt (shown after settlement) -->
+  <div id="receipt-card">
+    <div class="receipt-title">SESSION RECEIPT</div>
+    <div class="receipt-row"><span class="rk">STATUS</span><span class="rv" id="r-status">—</span></div>
+    <div class="receipt-row"><span class="rk">DURATION</span><span class="rv" id="r-duration">—</span></div>
+    <div class="receipt-row"><span class="rk">AMOUNT</span><span class="rv" id="r-amount">—</span></div>
+    <div class="receipt-row"><span class="rk">TX HASH</span><span class="rv" id="r-tx">—</span></div>
+    <a id="r-explorer" class="tx-link" href="#" target="_blank">View on Arc Explorer →</a>
+  </div>
+
+  <div class="footer">STREAMGATE · ARC TESTNET · CIRCLE USDC</div>
+</div>
+
+<script>
+  // ── Config — update these when Cloudflare tunnel URLs change ─────────────
+  const SIDECAR = 'https://california-spirit-earn-publicity.trycloudflare.com';
+  const OWNCAST = 'https://public-destinations-median-guitar.trycloudflare.com';
+  const HLS_URL = `${OWNCAST}/hls/stream.m3u8`;
+  const EXPLORER = 'https://testnet.arcscan.app/tx/0x';
+
+  const params = new URLSearchParams(window.location.search);
+  const wallet = params.get('wallet') || '';
+  const rate   = parseFloat(params.get('rate') || '0.001');
+
+  document.getElementById('sg-rate').textContent   = `$${rate.toFixed(4)}/sec`;
+  document.getElementById('sg-wallet').textContent =
+    wallet ? `${wallet.slice(0,6)}…${wallet.slice(-4)}` : 'no wallet';
+
+  // ── HLS Player ────────────────────────────────────────────────────────────
+  const video = document.getElementById('stream-video');
+
+  function loadStream() {
+    if (Hls.isSupported()) {
+      const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+      hls.loadSource(HLS_URL);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {});
+        document.getElementById('offline-overlay').style.display = 'none';
+        document.getElementById('live-badge').style.display = 'block';
+      });
+      hls.on(Hls.Events.ERROR, (_, d) => {
+        if (d.fatal) {
+          document.getElementById('offline-overlay').style.display = 'flex';
+          document.getElementById('live-badge').style.display = 'none';
+          setTimeout(loadStream, 10000);
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = HLS_URL;
+      video.play().catch(() => {});
+    }
+  }
+
+  loadStream();
+
+  // ── Payment ───────────────────────────────────────────────────────────────
+  let startTime  = null;
+  let meterTimer = null;
+  let viewerId   = null;
+  let registered = false;
+
+  window.activatePayment = async function() {
+    const name = document.getElementById('username-input').value.trim();
+    if (!name) return;
+    if (!wallet) { alert('No wallet — go back'); return; }
+
+    document.getElementById('start-btn').disabled = true;
+    document.getElementById('sg-status').textContent = 'Connecting…';
+
+    const vid = 'sg_' + name.toLowerCase().replace(/\s+/g, '_') + '_' + Date.now();
+
+    try {
+      const res = await fetch(`${SIDECAR}/viewer/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ viewer_id: vid, wallet_address: wallet }),
+      });
+
+      if (res.ok) {
+        registered = true;
+        viewerId   = vid;
+
+        // Fire USER_JOINED webhook directly so sidecar opens the session
+        await fetch(`${SIDECAR}/webhook`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'USER_JOINED',
+            eventData: { id: vid, user: { id: vid, displayName: name } }
+          }),
+        });
+
+        startTime = Date.now();
+        document.getElementById('sg-dot').className    = 'status-dot live';
+        document.getElementById('sg-status').textContent = 'Live · Paying';
+        document.getElementById('activate-success').style.display = 'block';
+        document.getElementById('username-input').style.display   = 'none';
+        document.getElementById('start-btn').style.display        = 'none';
+
+        startMeter();
+        setTimeout(pollReceipt, 10000);
+
+        // Fire USER_PARTED when viewer closes/leaves the page
+        window.addEventListener('beforeunload', () => {
+          const body = JSON.stringify({
+            type: 'USER_PARTED',
+            eventData: { id: vid, user: { id: vid } }
+          });
+          navigator.sendBeacon(`${SIDECAR}/webhook`,
+            new Blob([body], { type: 'application/json' })
+          );
+        });
+
+      } else {
+        throw new Error('Sidecar rejected');
+      }
+    } catch(e) {
+      document.getElementById('sg-status').textContent = 'Sidecar offline';
+      document.getElementById('sg-dot').className = 'status-dot error';
+      document.getElementById('start-btn').disabled = false;
+    }
+  };
+
+  function startMeter() {
+    meterTimer = setInterval(() => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      document.getElementById('sg-amount').textContent =
+        `$${(elapsed * rate).toFixed(6)}`;
+      document.getElementById('sg-timer').textContent =
+        `${Math.floor(elapsed)}s watched`;
+    }, 200);
+  }
+
+  async function pollReceipt() {
+    if (!viewerId) return;
+    try {
+      const r = await fetch(`${SIDECAR}/earnings`);
+      const d = await r.json();
+      const s = d.recent_settled?.find(x => x.viewer_id === viewerId && x.status === 'settled');
+      if (s) { clearInterval(meterTimer); showReceipt(s); return; }
+    } catch {}
+    setTimeout(pollReceipt, 5000);
+  }
+
+  function showReceipt(data) {
+    document.getElementById('activate-card').style.display = 'none';
+    document.getElementById('receipt-card').style.display  = 'block';
+    document.getElementById('sg-dot').className = 'status-dot';
+    document.getElementById('sg-status').textContent = 'Settled ✓';
+
+    document.getElementById('r-status').textContent   = 'SETTLED ✓';
+    document.getElementById('r-duration').textContent = `${parseFloat(data.duration_sec).toFixed(1)}s`;
+    document.getElementById('r-amount').textContent   = `$${parseFloat(data.amount_usdc).toFixed(6)} USDC`;
+    document.getElementById('r-tx').textContent       =
+      data.tx_hash ? `${data.tx_hash.slice(0,16)}…` : 'pending';
+
+    if (data.tx_hash) {
+      const link = document.getElementById('r-explorer');
+      link.href = EXPLORER + data.tx_hash;
+    }
+  }
+</script>
+</body>
+</html>
+

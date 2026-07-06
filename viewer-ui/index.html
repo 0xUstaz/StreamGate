@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StreamGate — Pay-Per-Second Viewer</title>
+<title>StreamGate — Pay-Per-Second Streaming</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   body {
     font-family: 'Courier New', monospace;
     background: #0a0a0f;
@@ -17,289 +16,105 @@
     justify-content: center;
     padding: 20px;
   }
-
   .card {
     background: #12121e;
     border: 1px solid #2a2a4a;
     border-radius: 12px;
-    padding: 32px;
+    padding: 28px;
     width: 100%;
-    max-width: 480px;
-    box-shadow: 0 0 40px rgba(100, 80, 255, 0.15);
+    max-width: 420px;
+    box-shadow: 0 0 40px rgba(100,80,255,0.15);
   }
-
-  .logo {
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: #6060aa;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  h1 {
-    font-size: 22px;
-    color: #a0a0ff;
-    margin-bottom: 4px;
-  }
-
-  .subtitle {
-    font-size: 12px;
-    color: #4a4a7a;
-    margin-bottom: 28px;
-  }
-
-  /* ── Sections ── */
-  .section { margin-bottom: 24px; }
-
-  label {
-    display: block;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: #6060aa;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    padding: 10px 14px;
-    background: #0a0a18;
-    border: 1px solid #2a2a4a;
-    border-radius: 6px;
-    color: #c0c0ff;
-    font-family: monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input[type="text"]:focus { border-color: #5050cc; }
-
-  /* ── Rate selector ── */
-  .rate-options {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .rate-btn {
-    flex: 1;
-    min-width: 80px;
-    padding: 8px 4px;
-    background: #0a0a18;
-    border: 1px solid #2a2a4a;
-    border-radius: 6px;
-    color: #8080cc;
-    font-family: monospace;
-    font-size: 12px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.15s;
-  }
-
-  .rate-btn:hover    { border-color: #5050cc; color: #a0a0ff; }
-  .rate-btn.selected { border-color: #7070ff; background: #1a1a3a; color: #c0c0ff; }
-
-  /* ── Connect button ── */
-  .btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
+  .logo { font-size: 10px; letter-spacing: 4px; color: #6060aa; text-transform: uppercase; margin-bottom: 6px; }
+  h1 { font-size: 20px; color: #a0a0ff; margin-bottom: 4px; }
+  .subtitle { font-size: 11px; color: #4a4a7a; margin-bottom: 16px; }
+  .steps {
+    background: #0d0d1a;
+    border: 1px solid #1e1e3a;
     border-radius: 8px;
-    font-family: monospace;
-    font-size: 14px;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #4040cc, #6030aa);
-    color: #fff;
-  }
-  .btn-primary:hover { background: linear-gradient(135deg, #5050dd, #7040bb); }
-  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .btn-danger {
-    background: #2a0a0a;
-    color: #ff6060;
-    border: 1px solid #4a1a1a;
-    margin-top: 10px;
-  }
-  .btn-danger:hover { background: #3a1010; }
-
-  /* ── Live meter ── */
-  #meter {
-    display: none;
-    text-align: center;
-    padding: 20px 0;
-  }
-
-  .meter-label {
-    font-size: 10px;
-    letter-spacing: 3px;
-    color: #6060aa;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .meter-value {
-    font-size: 36px;
-    color: #80ff80;
-    letter-spacing: 2px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .meter-timer {
-    font-size: 13px;
-    color: #4a4a7a;
-    margin-top: 6px;
-  }
-
-  .pulse {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #40ff40;
-    margin-right: 6px;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1;   transform: scale(1); }
-    50%       { opacity: 0.3; transform: scale(0.7); }
-  }
-
-  /* ── Receipt ── */
-  #receipt {
-    display: none;
-    background: #0a120a;
-    border: 1px solid #1a3a1a;
-    border-radius: 8px;
-    padding: 16px;
-    font-size: 12px;
+    padding: 12px 14px;
+    margin-bottom: 22px;
+    font-size: 11px;
+    color: #5a5a8a;
     line-height: 2;
   }
-
-  #receipt .receipt-row {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #1a2a1a;
-    padding: 4px 0;
+  .steps span { color: #7070bb; }
+  .section { margin-bottom: 18px; }
+  label { display: block; font-size: 10px; letter-spacing: 2px; color: #6060aa; text-transform: uppercase; margin-bottom: 8px; }
+  input[type="text"] {
+    width: 100%; padding: 10px 14px;
+    background: #0a0a18; border: 1px solid #2a2a4a;
+    border-radius: 6px; color: #c0c0ff;
+    font-family: monospace; font-size: 13px; outline: none;
+    transition: border-color 0.2s;
   }
-  #receipt .receipt-row:last-child { border-bottom: none; }
-  #receipt .receipt-key   { color: #406040; }
-  #receipt .receipt-value { color: #80ff80; word-break: break-all; text-align: right; max-width: 60%; }
-
-  /* ── Status message ── */
-  #msg {
-    font-size: 11px;
-    color: #6060aa;
-    text-align: center;
-    min-height: 18px;
-    margin-top: 8px;
+  input[type="text"]:focus { border-color: #5050cc; }
+  .rate-options { display: flex; gap: 8px; flex-wrap: wrap; }
+  .rate-btn {
+    flex: 1; min-width: 70px; padding: 8px 4px;
+    background: #0a0a18; border: 1px solid #2a2a4a;
+    border-radius: 6px; color: #8080cc;
+    font-family: monospace; font-size: 11px;
+    cursor: pointer; text-align: center; transition: all 0.15s;
   }
+  .rate-btn:hover { border-color: #5050cc; color: #a0a0ff; }
+  .rate-btn.selected { border-color: #7070ff; background: #1a1a3a; color: #c0c0ff; }
+  .btn {
+    width: 100%; padding: 13px; border: none; border-radius: 8px;
+    font-family: monospace; font-size: 14px;
+    cursor: pointer; letter-spacing: 1px; transition: all 0.2s;
+  }
+  .btn-primary { background: linear-gradient(135deg, #4040cc, #6030aa); color: #fff; }
+  .btn-primary:hover { background: linear-gradient(135deg, #5050dd, #7040bb); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  #msg { font-size: 11px; color: #6060aa; text-align: center; min-height: 16px; margin-top: 10px; }
   #msg.error { color: #ff6060; }
-  #msg.ok    { color: #60ff60; }
+  .footer { margin-top: 20px; text-align: center; font-size: 10px; color: #3a3a5a; line-height: 1.6; }
+  .footer a { color: #4a4a7a; text-decoration: none; }
 </style>
 </head>
 <body>
-
 <div class="card">
   <div class="logo">StreamGate</div>
   <h1>Pay-per-second</h1>
-  <p class="subtitle">Powered by Arc · Circle Gateway · USDC</p>
+  <p class="subtitle">Watch live. Pay only for what you watch.</p>
 
-  <!-- ── Step 1: Setup ── -->
-  <div id="setup">
-    <div class="section">
-      <label>Your wallet address</label>
-      <input type="text" id="walletInput" placeholder="0x…" maxlength="42" />
-    </div>
-
-    <div class="section">
-      <label>Spending rate</label>
-      <div class="rate-options" id="rateOptions">
-        <button class="rate-btn" data-rate="0.0001">$0.0001<br><small>/sec</small></button>
-        <button class="rate-btn selected" data-rate="0.001">$0.001<br><small>/sec</small></button>
-        <button class="rate-btn" data-rate="0.005">$0.005<br><small>/sec</small></button>
-        <button class="rate-btn" data-rate="0.01">$0.01<br><small>/sec</small></button>
-      </div>
-    </div>
-
-    <div class="section">
-      <label>Your Owncast viewer ID</label>
-      <input type="text" id="viewerIdInput" placeholder="Paste from Owncast chat (top-right)" />
-      <div style="font-size:10px; color:#4a4a6a; margin-top:6px;">
-        Open Owncast → click your name → copy the ID shown
-      </div>
-    </div>
-
-    <button class="btn btn-primary" id="connectBtn" onclick="connect()">
-      Connect &amp; Start Watching
-    </button>
-    <div id="msg"></div>
+  <div class="steps">
+    <span>①</span> Enter wallet + pick rate<br>
+    <span>②</span> Click Watch — stream opens here<br>
+    <span>③</span> Join the chat on the stream<br>
+    <span>④</span> USDC settles when you leave
   </div>
 
-  <!-- ── Step 2: Live meter ── -->
-  <div id="meter">
-    <span class="pulse"></span>
-    <div class="meter-label">Watching · Spending</div>
-    <div class="meter-value" id="meterValue">$0.000000</div>
-    <div class="meter-timer" id="meterTimer">0 seconds</div>
-    <div style="font-size:11px; color:#4a4a6a; margin-top:4px;" id="meterRate"></div>
-
-    <button class="btn btn-danger" onclick="stopWatching()">
-      Stop Watching &amp; Pay
-    </button>
-    <div id="msg2" style="font-size:11px; color:#6060aa; text-align:center; margin-top:8px;"></div>
+  <div class="section">
+    <label>Your wallet address</label>
+    <input type="text" id="walletInput" placeholder="0x…" maxlength="42" />
   </div>
 
-  <!-- ── Step 3: Receipt ── -->
-  <div id="receipt">
-    <div class="receipt-row">
-      <span class="receipt-key">STATUS</span>
-      <span class="receipt-value" id="rStatus">—</span>
+  <div class="section">
+    <label>Spending rate</label>
+    <div class="rate-options">
+      <button class="rate-btn" data-rate="0.0001">$0.0001<br><small>/sec</small></button>
+      <button class="rate-btn selected" data-rate="0.001">$0.001<br><small>/sec</small></button>
+      <button class="rate-btn" data-rate="0.005">$0.005<br><small>/sec</small></button>
+      <button class="rate-btn" data-rate="0.01">$0.01<br><small>/sec</small></button>
     </div>
-    <div class="receipt-row">
-      <span class="receipt-key">DURATION</span>
-      <span class="receipt-value" id="rDuration">—</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-key">AMOUNT</span>
-      <span class="receipt-value" id="rAmount">—</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-key">TX / PAYMENT ID</span>
-      <span class="receipt-value" id="rTx">—</span>
-    </div>
-    <div class="receipt-row">
-      <span class="receipt-key">CHAIN</span>
-      <span class="receipt-value">Arc Testnet · USDC</span>
-    </div>
-    <div style="margin-top:12px; text-align:center;">
-      <button class="btn btn-primary" onclick="reset()" style="width:auto; padding: 8px 24px;">
-        Watch Again
-      </button>
-    </div>
+  </div>
+
+  <button class="btn btn-primary" id="watchBtn" onclick="startWatching()">
+    ▶ Watch Live Stream
+  </button>
+  <div id="msg"></div>
+
+  <div class="footer">
+    <a href="https://github.com/0xUstaz/streamgate" target="_blank">github.com/0xUstaz/streamgate</a>
+    · Arc Testnet · USDC
   </div>
 </div>
 
 <script>
-  // ── Config ────────────────────────────────────────────────────────────────
-  // Change this to your Oracle Cloud IP once deployed
-  const SIDECAR_URL = window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : `http://${window.location.hostname}:8000`;
-
-  // ── State ─────────────────────────────────────────────────────────────────
   let selectedRate = 0.001;
-  let timerInterval = null;
-  let startTime = null;
-  let viewerId  = '';
 
-  // ── Rate selector ─────────────────────────────────────────────────────────
   document.querySelectorAll('.rate-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('selected'));
@@ -308,125 +123,19 @@
     });
   });
 
-  // ── Connect ───────────────────────────────────────────────────────────────
-  async function connect() {
-    const wallet   = document.getElementById('walletInput').value.trim();
-    const vidInput = document.getElementById('viewerIdInput').value.trim();
-
+  function startWatching() {
+    const wallet = document.getElementById('walletInput').value.trim();
     if (!wallet.startsWith('0x') || wallet.length !== 42) {
       setMsg('⚠ Enter a valid 0x wallet address', 'error'); return;
     }
-    if (!vidInput) {
-      setMsg('⚠ Enter your Owncast viewer ID', 'error'); return;
-    }
-
-    viewerId = vidInput;
-    document.getElementById('connectBtn').disabled = true;
-    setMsg('Registering wallet…');
-
-    try {
-      const res = await fetch(`${SIDECAR_URL}/viewer/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ viewer_id: viewerId, wallet_address: wallet }),
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      setMsg('');
-      showMeter();
-    } catch (e) {
-      setMsg(`❌ ${e.message}`, 'error');
-      document.getElementById('connectBtn').disabled = false;
-    }
+    // Redirect to /watch with wallet and rate as params
+    window.location.href = `/watch?wallet=${encodeURIComponent(wallet)}&rate=${selectedRate}`;
   }
 
-  // ── Live meter ────────────────────────────────────────────────────────────
-  function showMeter() {
-    document.getElementById('setup').style.display  = 'none';
-    document.getElementById('meter').style.display  = 'block';
-    document.getElementById('meterRate').textContent =
-      `Rate: $${selectedRate.toFixed(4)}/sec`;
-
-    startTime = Date.now();
-    timerInterval = setInterval(updateMeter, 100);
-  }
-
-  function updateMeter() {
-    const elapsed = (Date.now() - startTime) / 1000;
-    const cost    = elapsed * selectedRate;
-
-    document.getElementById('meterValue').textContent = `$${cost.toFixed(6)}`;
-    document.getElementById('meterTimer').textContent =
-      `${Math.floor(elapsed)}s watched`;
-  }
-
-  // ── Stop watching ─────────────────────────────────────────────────────────
-  async function stopWatching() {
-    clearInterval(timerInterval);
-    const msg2 = document.getElementById('msg2');
-    msg2.textContent = 'Settling payment…';
-
-    // The sidecar auto-settles when Owncast fires userParted.
-    // We poll /sessions/live until our session disappears.
-    let settled = null;
-    for (let i = 0; i < 15; i++) {
-      await sleep(1000);
-      try {
-        const res  = await fetch(`${SIDECAR_URL}/sessions/live`);
-        const data = await res.json();
-        const still = data.sessions.find(s => s.viewer_id === viewerId);
-        if (!still) {
-          // Session closed — fetch recent to get receipt
-          const earnRes  = await fetch(`${SIDECAR_URL}/earnings`);
-          const earnData = await earnRes.json();
-          settled = earnData.recent_settled?.find(s => s.viewer_id === viewerId);
-          break;
-        }
-      } catch {}
-    }
-
-    showReceipt(settled);
-  }
-
-  // ── Receipt ───────────────────────────────────────────────────────────────
-  function showReceipt(data) {
-    document.getElementById('meter').style.display   = 'none';
-    document.getElementById('receipt').style.display = 'block';
-
-    if (data) {
-      document.getElementById('rStatus').textContent   = data.status?.toUpperCase() || '—';
-      document.getElementById('rDuration').textContent = `${data.duration_sec?.toFixed(1)}s`;
-      document.getElementById('rAmount').textContent   = `$${parseFloat(data.amount_usdc).toFixed(6)} USDC`;
-      document.getElementById('rTx').textContent       = data.tx_hash || 'pending batch';
-    } else {
-      document.getElementById('rStatus').textContent   = 'SETTLED';
-      const elapsed = (Date.now() - startTime) / 1000;
-      document.getElementById('rDuration').textContent = `${elapsed.toFixed(1)}s`;
-      document.getElementById('rAmount').textContent   = `$${(elapsed * selectedRate).toFixed(6)} USDC`;
-      document.getElementById('rTx').textContent       = 'pending (check /earnings)';
-    }
-  }
-
-  // ── Reset ─────────────────────────────────────────────────────────────────
-  function reset() {
-    document.getElementById('receipt').style.display = 'none';
-    document.getElementById('setup').style.display   = 'block';
-    document.getElementById('connectBtn').disabled   = false;
-    setMsg('');
-    startTime = null;
-    viewerId  = '';
-  }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
-  function setMsg(text, type = '') {
+  function setMsg(t, type = '') {
     const el = document.getElementById('msg');
-    el.textContent  = text;
-    el.className    = type;
+    el.textContent = t; el.className = type;
   }
-
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
-

@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/watch", "destination": "/watch.html" },
+    { "source": "/stream/:path*", "destination": "http://129.80.199.123:8080/:path*" }
+  ]
+}
+
